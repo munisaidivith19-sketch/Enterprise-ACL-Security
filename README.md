@@ -1,5 +1,5 @@
 
-# CCNA Project 03 - Enterprise ACL Security
+# CCNA - Enterprise ACL Security
 
 ## Project Overview
 
