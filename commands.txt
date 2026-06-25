@@ -1,1 +1,207 @@
 
+==================================================
+CCNA - ENTERPRISE ACL SECURITY
+Cisco Packet Tracer
+===================
+
+==========================
+SW1 CONFIGURATION
+=================
+
+enable
+
+configure terminal
+
+vlan 10
+name HR
+
+vlan 20
+name FINANCE
+
+interface range fa0/1-5
+switchport mode access
+switchport access vlan 10
+
+interface range fa0/6-10
+switchport mode access
+switchport access vlan 20
+
+interface g0/1
+switchport mode trunk
+no shutdown
+
+end
+
+write memory
+
+==================================================
+
+==========================
+SW2 CONFIGURATION
+=================
+
+enable
+
+configure terminal
+
+vlan 30
+name IT
+
+interface range fa0/1-5
+switchport mode access
+switchport access vlan 30
+
+interface g0/1
+switchport mode access
+switchport access vlan 30
+no shutdown
+
+end
+
+write memory
+
+==================================================
+
+==========================
+ROUTER CONFIGURATION
+====================
+
+enable
+
+configure terminal
+
+interface g0/0
+no ip address
+no shutdown
+
+interface g0/0.10
+encapsulation dot1Q 10
+ip address 192.168.10.1 255.255.255.0
+
+interface g0/0.20
+encapsulation dot1Q 20
+ip address 192.168.20.1 255.255.255.0
+
+interface g0/1
+ip address 192.168.30.1 255.255.255.0
+no shutdown
+
+==================================================
+
+==========================
+DHCP CONFIGURATION
+==================
+
+ip dhcp pool HR
+network 192.168.10.0 255.255.255.0
+default-router 192.168.10.1
+dns-server 8.8.8.8
+
+ip dhcp pool FINANCE
+network 192.168.20.0 255.255.255.0
+default-router 192.168.20.1
+dns-server 8.8.8.8
+
+ip dhcp pool IT
+network 192.168.30.0 255.255.255.0
+default-router 192.168.30.1
+dns-server 8.8.8.8
+
+end
+
+write memory
+
+==================================================
+
+==========================
+ACL CONFIGURATION
+=================
+
+configure terminal
+
+access-list 100 deny ip 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
+access-list 100 permit ip any any
+
+interface g0/0.20
+ip access-group 100 in
+
+exit
+
+access-list 101 deny ip 192.168.30.0 0.0.0.255 192.168.10.0 0.0.0.255
+access-list 101 deny ip 192.168.30.0 0.0.0.255 192.168.20.0 0.0.0.255
+access-list 101 permit ip any any
+
+interface g0/1
+ip access-group 101 in
+
+end
+
+write memory
+
+==================================================
+
+==========================
+VERIFICATION COMMANDS
+=====================
+
+show vlan brief
+
+show interfaces trunk
+
+show ip interface brief
+
+show ip dhcp binding
+
+show ip dhcp pool
+
+show running-config
+
+show running-config interface g0/0.20
+
+show running-config interface g0/1
+
+show access-lists
+
+show ip route
+
+show cdp neighbors
+
+==================================================
+
+==========================
+TESTING
+=======
+
+HR --> Finance
+Expected : Success
+
+HR --> IT
+Expected : Success
+
+Finance --> HR
+Expected : Blocked
+
+Finance --> IT
+Expected : Allowed (ACL permits the request, but note that ICMP replies can be affected by return-path ACLs)
+
+IT --> HR
+Expected : Blocked
+
+IT --> Finance
+Expected : Blocked
+
+==================================================
+
+PROJECT COMPLETED
+
+Technologies:
+
+* VLAN
+* Trunk
+* Router-on-a-Stick
+* DHCP
+* Inter-VLAN Routing
+* Extended ACL
+* Cisco IOS
+* Enterprise Network Security
+  ==================================================
